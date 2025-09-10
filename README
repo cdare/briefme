@@ -1,0 +1,65 @@
+# briefme
+
+**briefme** is a Python application that generates a daily news digest by fetching RSS feeds, summarizing them using OpenAI, and sending the result as an HTML email.
+
+## Features
+
+- Fetches and parses multiple RSS feeds
+- Summarizes news items with OpenAI
+- Formats summaries as a styled HTML email
+- Sends the digest via SMTP email
+- All configuration via environment variables
+
+## Quick Start
+
+1. **Clone the repository and install dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+2. **Configure environment:**
+    - Copy `.env.example` to `.env` and fill in required values (API keys, email credentials, etc).
+
+3. **Run the daily digest:**
+    ```sh
+    python briefme/main.py
+    ```
+
+## Configuration
+
+All sensitive and environment-specific values are loaded from `.env` via `briefme/config.py` using `python-dotenv`.  
+No secrets are hardcoded.
+
+- **Add/modify RSS feeds:** Edit `RSS_FEEDS` in `config.py`.
+- **Change email template:** Edit `EMAIL_TEMPLATE` in `config.py`.
+- **Set email title:** Modify `TITLE` in `config.py` or set `TITLE` in `.env`.
+- **Update OpenAI prompt:** Edit `PROMPT_TEMPLATE` in `config.py`.
+- **Logging:** Set `LOG_LEVEL` in `.env` (e.g., `DEBUG`, `INFO`).
+
+## Logging
+
+Logging is configured in `briefme/log_config.py` to output to stdout.  
+Adjust verbosity with the `LOG_LEVEL` environment variable.
+
+## Developer Notes
+
+- No hardcoded secrets: use environment variables for all sensitive data.
+- Summarization prompt is structured for HTML output.
+- Email sending uses SMTP with SSL.
+
+## External Dependencies
+
+- `feedparser` for RSS parsing
+- `openai` for summarization
+- `python-dotenv` for environment loading
+- Standard Python modules: `logging`, `smtplib`, `ssl`, `email`
+
+## Example: Adding a New Feed
+
+Edit `RSS_FEEDS` in `config.py`:
+```python
+RSS_FEEDS = [
+     ...
+     "https://nitter.net/new_account/rss",
+]
+```
