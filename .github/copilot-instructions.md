@@ -29,6 +29,8 @@
   - Modify `PROMPT_TEMPLATE` in `config.py` to change how summaries are generated.
 - **Logging:**
   - All logs go to stdout. Adjust verbosity with the `LOG_LEVEL` env var (e.g., `DEBUG`, `INFO`).
+- **Testing:**
+  - Run `./run_tests.sh` to execute tests with coverage report. All tests are located in the `tests/` directory.
 
 ## Patterns & Conventions
 - **No hardcoded secrets:** All sensitive values must be loaded from environment variables.

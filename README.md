@@ -41,6 +41,10 @@ No secrets are hardcoded.
 Logging is configured in `briefme/log_config.py` to output to stdout.  
 Adjust verbosity with the `LOG_LEVEL` environment variable.
 
+## Testing
+
+Run `./run_tests.sh` to run pytest with coverage report
+
 ## Developer Notes
 
 - No hardcoded secrets: use environment variables for all sensitive data.
