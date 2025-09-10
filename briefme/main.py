@@ -4,10 +4,10 @@ import ssl
 from email.mime.text import MIMEText
 from openai import OpenAI
 
-from briefme.log_config import logger
+from .log_config import logger
 
 # ---------- CONFIG ----------
-from briefme.config import (
+from .config import (
     OPENAI_API_KEY,
     EMAIL_FROM,
     EMAIL_TO,

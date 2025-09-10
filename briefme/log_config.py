@@ -1,7 +1,7 @@
 import logging
 import os, sys
 
-from briefme.config import LOG_LEVEL
+from .config import LOG_LEVEL
 
 logger = logging.getLogger(__name__)
 
