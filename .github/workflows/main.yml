@@ -32,5 +32,8 @@ jobs:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          TITLE: ${{vars.TITLE}}
+          SMTP_SERVER: ${{vars.SMTP_SERVER}}
+          SMTP_PORT: ${{vars.SMTP_PORT}}
         run: |
           python -m briefme.main
