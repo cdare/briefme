@@ -19,10 +19,11 @@
 
 2. **Configure environment:**
     - Copy `.env.example` to `.env` and fill in required values (API keys, email credentials, etc).
+    - Copy `feeds.yaml.example` to `feeds.yaml` and add the  RSS feeds you want to subscribe to
 
 3. **Run the daily digest:**
     ```sh
-    python briefme/main.py
+    python -m briefme.main
     ```
 
 ## Configuration
@@ -60,10 +61,8 @@ Run `./run_tests.sh` to run pytest with coverage report
 
 ## Example: Adding a New Feed
 
-Edit `RSS_FEEDS` in `config.py`:
-```python
-RSS_FEEDS = [
-     ...
-     "https://nitter.net/new_account/rss",
-]
+Edit `feeds.yaml` in `briefme/`:
+```yaml
+feeds:
+    - https://nitter.net/new_account/rss
 ```

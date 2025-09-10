@@ -14,13 +14,20 @@
 ## Developer Workflows
 - **Run the daily digest:**
   ```sh
-  python briefme/app.py
+  python -m briefme.main
   ```
 - **Configure environment:**
   - Copy `.env.example` to `.env` and fill in required values (API keys, email credentials, etc).
   - All config is loaded at runtime; no secrets should be hardcoded.
 - **Add/modify feeds:**
-  - Edit the `RSS_FEEDS` list in `config.py`.
+  - Edit the `feeds.yaml` file in the `briefme/` directory. Example:
+    ```yaml
+    feeds:
+      - https://nitter.net/ryotkak/rss
+      - https://nitter.net/kevin_mizu/rss
+      - https://nitter.net/terjanq
+      - https://www.bleepingcomputer.com/feed/
+    ```
 - **Change email template:**
   - Edit `EMAIL_TEMPLATE` in `config.py` (HTML string).
 - **Set email title:**
@@ -45,12 +52,10 @@
 - Standard Python `logging`, `smtplib`, `ssl`, and `email` modules
 
 ## Example: Adding a New Feed
-Edit `RSS_FEEDS` in `config.py`:
-```python
-RSS_FEEDS = [
-    ...
-    "https://nitter.net/new_account/rss",
-]
+Edit `feeds.yaml` in `briefme/`:
+```yaml
+feeds:
+  - https://nitter.net/new_account/rss
 ```
 
 ## Example: Changing Log Level

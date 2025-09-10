@@ -2,23 +2,25 @@
 PROMPT_TEMPLATE = """
 Summarise the following updates into a clear daily digest (max {max_words} words):\n\n{text}.
 
-Split into the following sections:
+The summary should start with an overview paragraph then, split into the following sections:
 - Cybersecurity News
 - Vulnerability Writeups and Disclosures
 
 The summary should be concise, informative, and easy to read. Use bullet points or short paragraphs as needed.
 It will be inserted into an HTML email template. Each section should be wrapped in <div class="section"> with a heading <h2>.
 
-Include links from the original articles.
+Include links to the original articles.
 
-If there are any articles in the feed that do not relate to cybersecurity, ignore them.
+If there are any articles in the feed that do not relate to cybersecurity, ignore them. If the article is more than 24 hours old, ignore it.
 
 Translate any non-English text to English.
 
-Do not add any notes, comments, or disclaimers at the beginning or end of the summary. Only produce the HTML content.
+Do not add any notes, comments, or disclaimers at the beginning or end of the summary. Only produce the HTML content. Do not wrap in backticks or quotes.
 """
+
 import os
 from dotenv import load_dotenv
+import yaml
 
 # Load environment variables from .env file
 load_dotenv()
@@ -34,13 +36,11 @@ TITLE = os.getenv("TITLE", "Your News Digest")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-# RSS feeds (blogs + Nitter for Twitter accounts)
-RSS_FEEDS = [
-    "https://nitter.net/ryotkak/rss",                
-    "https://nitter.net/kevin_mizu/rss",   
-    "https://nitter.net/terjanq",
-    "https://www.bleepingcomputer.com/feed/"
-]
+
+# Load RSS feeds from feeds.yaml
+with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'feeds.yaml'), 'r') as f:
+  feeds_config = yaml.safe_load(f)
+RSS_FEEDS = feeds_config.get('feeds', [])
 EMAIL_TEMPLATE = """\
 <!DOCTYPE html>
 <html lang="en">
