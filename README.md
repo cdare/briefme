@@ -37,10 +37,13 @@ No secrets are hardcoded.
 - **Update OpenAI prompt:** Edit `PROMPT_TEMPLATE` in `config.py`.
 - **Logging:** Set `LOG_LEVEL` in `.env` (e.g., `DEBUG`, `INFO`).
 
-## Logging
+## Automation
 
-Logging is configured in `briefme/log_config.py` to output to stdout.  
-Adjust verbosity with the `LOG_LEVEL` environment variable.
+You can run as a GitHub action, see [workflow.example.yml](workflow.example.yml) for an example. Note that the feeds yml is provided as a base64 encode secret. You can create that as follows:
+
+```
+cat feeds.yaml | base64
+```
 
 ## Testing
 
