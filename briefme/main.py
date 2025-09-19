@@ -1,8 +1,10 @@
 import feedparser
 import smtplib
 import ssl
+import json
 from email.mime.text import MIMEText
 from openai import OpenAI
+from typing import List
 
 from .log_config import logger
 
@@ -20,28 +22,47 @@ from .config import (
     PROMPT_TEMPLATE
 )
 
+class RSSItem:
+    def __init__(self, title, summary, link):
+        self.title = title
+        self.summary = summary
+        self.link = link
+
 # ---------- FETCH FEEDS ----------
-def fetch_rss_content(feeds, max_items=5):
-    texts = []
+def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
+    items = []
     for url in feeds:
         feed = feedparser.parse(url)
         logger.info(f"Fetched feed from {url} with {len(feed.entries)} entries.")
         for entry in feed.entries[:max_items]:
-            title = entry.get("title", "")
-            summary = entry.get("summary", "")
-            texts.append(f"{title}\n{summary}")
-    return "\n\n".join(texts)
+
+            if "pubDate" in entry:
+                #Check if published date is older than 24 hours
+                from datetime import datetime, timedelta
+                pub_date = datetime(*entry.published_parsed[:6])
+                if pub_date < datetime.now() - timedelta(days=1):
+                    continue
+            item = RSSItem(
+                title=entry.get("title", ""),
+                summary=entry.get("summary", ""),
+                link=entry.get("link", "")
+            )
+            items.append(item)
+    return items
 
 # ---------- SUMMARISE WITH OPENAI ----------
-def summarise_text(text, max_words=2000):
+def summarise_text(items: List[RSSItem], max_words=2000):
     client = OpenAI(api_key=OPENAI_API_KEY)
-    prompt = PROMPT_TEMPLATE.format(max_words=max_words, text=text)
-    response = client.chat.completions.create(
+    json_dict = [item.__dict__ for item in items]
+    prompt = PROMPT_TEMPLATE
+
+    response = client.responses.create(
         model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=600,
+        instructions=prompt,
+        input=json.dumps(json_dict),
     )
-    content = response.choices[0].message.content
+
+    content = response.output_text
     logger.debug(f"Generated summary content:\n-------\n\n{content}")
     return content
 
@@ -60,11 +81,11 @@ def send_email(subject, body):
 # ---------- MAIN ----------
 if __name__ == "__main__":
     logger.info("Starting daily digest process...")
-    raw_content = fetch_rss_content(RSS_FEEDS)
-    if not raw_content.strip():
+    rss_items: List[RSSItem] = fetch_rss_content(RSS_FEEDS)
+    if not rss_items:
         summary = "No new updates today."
     else:
-        summary = summarise_text(raw_content)
+        summary = summarise_text(rss_items)
         html_summary = EMAIL_TEMPLATE.format(summary=summary, title=TITLE)
 
     send_email(TITLE, html_summary)

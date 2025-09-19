@@ -1,23 +1,3 @@
-# Prompt template for OpenAI summarization
-PROMPT_TEMPLATE = """
-Summarise the following updates into a clear daily digest (max {max_words} words):\n\n{text}.
-
-The summary should start with an overview paragraph then, split into the following sections:
-- Cybersecurity News
-- Vulnerability Writeups and Disclosures
-
-The summary should be concise, informative, and easy to read. Use bullet points or short paragraphs as needed.
-It will be inserted into an HTML email template. Each section should be wrapped in <div class="section"> with a heading <h2>.
-
-Include links to the original articles.
-
-If there are any articles in the feed that do not relate to cybersecurity, ignore them. If the article is more than 24 hours old, ignore it.
-
-Translate any non-English text to English.
-
-Do not add any notes, comments, or disclaimers at the beginning or end of the summary. Only produce the HTML content. Do not wrap in backticks or quotes.
-"""
-
 import os
 from dotenv import load_dotenv
 import yaml
@@ -72,4 +52,30 @@ EMAIL_TEMPLATE = """\
   </div>
 </body>
 </html>
+"""
+
+# Prompt template for OpenAI summarization
+PROMPT_TEMPLATE =f"""You are an assistant that creates a daily cybersecurity news digest from a list of JSON items.
+
+Summarise the inputted list of JSON items into a clear daily digest with max 600 words). Use the following template:
+
+{EMAIL_TEMPLATE}
+
+The summary should start with an overview paragraph then split into the following sections:
+- Cybersecurity News (contains general news articles related to cybersecurity)
+- Vulnerability Writeups and Disclosures (contains writeups on bug bounties, vulnerabilities, exploits, and disclosures)
+
+The summary should be concise, informative, and easy to read. Use bullet points or short paragraphs as needed.
+
+If there are too many articles to fit in the word limit, prioritise the most important and relevant ones.
+
+It will be inserted into an HTML email template. Each section should be wrapped in <div class="section"> with a heading <h2>.
+
+Create links to the original articles using the URLs provided in the JSON.
+
+If there are any articles in the feed that do not relate to cybersecurity, ignore them. If the article is more than 24 hours old, ignore it.
+
+Translate any non-English text to English.
+
+Do not add any notes, comments, or disclaimers at the beginning or end of the summary. Only produce the HTML content. Do not wrap in backticks or quotes.
 """
