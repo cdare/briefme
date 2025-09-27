@@ -19,7 +19,9 @@ from .config import (
     RSS_FEEDS,
     EMAIL_TEMPLATE,
     TITLE,
-    AGENT_PROMPT
+    AGENT_PROMPT,
+    OPENAI_MAX_TOKENS,
+    MAX_AGE_HOURS
 )
 
 class RSSItem:
@@ -36,34 +38,37 @@ def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
         logger.info(f"Fetched feed from {url} with {len(feed.entries)} entries.")
         for entry in feed.entries[:max_items]:
 
-            if "pubDate" in entry:
-                #Check if published date is older than 24 hours
+            if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                #Check if published date is older than MAX_AGE_HOURS hours
                 from datetime import datetime, timedelta
                 pub_date = datetime(*entry.published_parsed[:6])
-                if pub_date < datetime.now() - timedelta(days=1):
+                if pub_date < datetime.now() - timedelta(hours=MAX_AGE_HOURS):
                     continue
-            item = RSSItem(
-                title=entry.get("title", ""),
-                summary=entry.get("summary", ""),
-                link=entry.get("link", "")
-            )
-            items.append(item)
+                item = RSSItem(
+                    title=entry.title,
+                    summary=entry.summary,
+                    link=entry.link
+                )
+                items.append(item)
     return items
 
 # ---------- SUMMARISE WITH OPENAI ----------
 def summarise_text(items: List[RSSItem], max_words=2000):
     client = OpenAI(api_key=OPENAI_API_KEY)
     json_dict = [item.__dict__ for item in items]
-    prompt = AGENT_PROMPT
+    try:
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            instructions=AGENT_PROMPT,
+            input=json.dumps(json_dict, indent=2),
+            max_output_tokens=OPENAI_MAX_TOKENS
+        )
 
-    response = client.responses.create(
-        model="gpt-4o-mini",
-        instructions=prompt,
-        input=json.dumps(json_dict),
-    )
-
-    content = response.output_text
-    logger.debug(f"Generated summary content:\n-------\n\n{content}")
+        content = response.output_text
+        logger.debug(f"Generated summary content:\n-------\n\n{content}")
+    except Exception as e:
+        logger.error(f"Error occurred while summarizing text using OpenAI API: {e}")
+        raise
     return content
 
 # ---------- SEND EMAIL ----------
@@ -82,11 +87,18 @@ def send_email(subject, body):
 if __name__ == "__main__":
     logger.info("Starting daily digest process...")
     rss_items: List[RSSItem] = fetch_rss_content(RSS_FEEDS)
+    
     if not rss_items:
-        summary = "No new updates today."
+        summary = "<div class='section'><h2>No Updates</h2><p>No new cybersecurity articles found today.</p></div>"
+        logger.info("No RSS items found")
     else:
+        logger.info(f"Processing {len(rss_items)} RSS items")
         summary = summarise_text(rss_items)
-        html_summary = EMAIL_TEMPLATE.format(summary=summary, title=TITLE)
-
-    send_email(TITLE, html_summary)
-    print("Daily summary sent!")
+    
+    html_summary = EMAIL_TEMPLATE.format(summary=summary, title=TITLE)
+    
+    try:
+        send_email(TITLE, html_summary)
+        logger.info("Daily summary sent successfully!")
+    except Exception as e:
+        logger.error(f"Failed to send email: {e}")
