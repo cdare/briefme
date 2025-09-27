@@ -14,3 +14,10 @@ def test_summarise_text_calls_openai_and_returns_content(mock_openai):
     items = [RSSItem(title='Test Title', summary='Test Summary', link='http://example.com')]
     result = summarise_text(items, max_words=100)
     assert 'summary' in result
+    
+    # Verify the correct API was called with proper parameters
+    mock_client.responses.create.assert_called_once()
+    call_args = mock_client.responses.create.call_args
+    assert call_args.kwargs['model'] == 'gpt-4o-mini'
+    assert 'instructions' in call_args.kwargs
+    assert 'input' in call_args.kwargs
