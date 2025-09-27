@@ -19,7 +19,7 @@ from .config import (
     RSS_FEEDS,
     EMAIL_TEMPLATE,
     TITLE,
-    PROMPT_TEMPLATE
+    AGENT_PROMPT
 )
 
 class RSSItem:
@@ -54,7 +54,7 @@ def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
 def summarise_text(items: List[RSSItem], max_words=2000):
     client = OpenAI(api_key=OPENAI_API_KEY)
     json_dict = [item.__dict__ for item in items]
-    prompt = PROMPT_TEMPLATE
+    prompt = AGENT_PROMPT
 
     response = client.responses.create(
         model="gpt-4o-mini",

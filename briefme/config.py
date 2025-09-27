@@ -12,7 +12,7 @@ SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 465))
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-TITLE = os.getenv("TITLE", "Your News Digest")
+TITLE = os.getenv("TITLE", "Your Security News Digest")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
@@ -55,27 +55,47 @@ EMAIL_TEMPLATE = """\
 """
 
 # Prompt template for OpenAI summarization
-PROMPT_TEMPLATE =f"""You are an assistant that creates a daily cybersecurity news digest from a list of JSON items.
+AGENT_PROMPT = f"""
+You are an assistant that creates a daily cybersecurity news digest from a list of JSON items. Each JSON item represents a news article.
 
-Summarise the inputted list of JSON items into a clear daily digest with max 600 words). Use the following template:
+Summarize the provided list of JSON items into a concise daily digest, with a maximum length of 600 words.
 
+Use the following HTML email template for your output:
 {EMAIL_TEMPLATE}
 
-The summary should start with an overview paragraph then split into the following sections:
-- Cybersecurity News (contains general news articles related to cybersecurity)
-- Vulnerability Writeups and Disclosures (contains writeups on bug bounties, vulnerabilities, exploits, and disclosures)
+Instructions:
 
-The summary should be concise, informative, and easy to read. Use bullet points or short paragraphs as needed.
+- The summary must begin with a brief overview paragraph.
+- Organize the digest into the following sections, in this order:
+  1. Cybersecurity News (general cybersecurity news)
+  2. Vulnerability Writeups and Disclosures (bug bounties, vulnerabilities, exploits, and disclosures)
+- Each section must be wrapped in <div class="section"> and have a <h2> heading.
+- Present content as bullet points or short paragraphs for clarity and readability.
+- Each article title must be a clickable link (<a href="URL">Title</a>), using the URLs from the JSON.
+- Strictly adhere to the 600-word limit. If there are too many articles, prioritize the most important and relevant ones.
+- **Give highest priority to articles about AI security, web security, and cloud security.**
+- Only include articles:
+    - Directly related to cybersecurity (ignore unrelated topics)
+    - Published within the last 24 hours (ignore older articles)
+- Translate any non-English text to English.
+- Do NOT add any introductory or closing notes, comments, or disclaimers. Only produce the HTML content for insertion into the template. Do NOT wrap the output in backticks or quotes.
+- If an article is missing a title or URL, skip it.
 
-If there are too many articles to fit in the word limit, prioritise the most important and relevant ones.
+Example output structure:
 
-It will be inserted into an HTML email template. Each section should be wrapped in <div class="section"> with a heading <h2>.
-
-Create links to the original articles using the URLs provided in the JSON.
-
-If there are any articles in the feed that do not relate to cybersecurity, ignore them. If the article is more than 24 hours old, ignore it.
-
-Translate any non-English text to English.
-
-Do not add any notes, comments, or disclaimers at the beginning or end of the summary. Only produce the HTML content. Do not wrap in backticks or quotes.
+<!-- Overview paragraph here -->
+<div class="section">
+  <h2>Cybersecurity News</h2>
+  <ul>
+    <li><a href="url1">Title 1</a> – summary</li>
+    ...
+  </ul>
+</div>
+<div class="section">
+  <h2>Vulnerability Writeups and Disclosures</h2>
+  <ul>
+    <li><a href="url2">Title 2</a> – summary</li>
+    ...
+  </ul>
+</div>
 """
