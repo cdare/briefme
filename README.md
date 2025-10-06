@@ -55,6 +55,19 @@ Run `./run_tests.sh` to run pytest with coverage report
 - Summarization prompt is structured for HTML output.
 - Email sending uses SMTP with SSL.
 
+## precommit
+
+Run the setup script to install and configure everything:
+
+```bash
+./setup-pre-commit.sh
+```
+
+This will:
+- Install pre-commit and related tools
+- Install the pre-commit hooks in your git repository
+- Run an initial check on all files
+
 ## External Dependencies
 
 - `feedparser` for RSS parsing

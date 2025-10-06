@@ -20,10 +20,7 @@ install-dev:
 	pip install -r requirements.txt -r requirements-dev.txt
 
 test:
-	pytest -v
-
-test-cov:
-	pytest --cov=briefme --cov-report=term-missing --cov-report=html
+	coverage run -m pytest -s tests
 
 lint:
 	flake8 briefme/ tests/
@@ -43,7 +40,7 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	rm -rf build/ dist/ .coverage htmlcov/ .pytest_cache/
+	rm -rf build/ dist/ .pytest_cache/
 
 setup-pre-commit:
 	./setup-pre-commit.sh
