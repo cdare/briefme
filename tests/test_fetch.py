@@ -5,10 +5,9 @@ from typing import List
 import datetime
 
 
-
 @pytest.fixture
 def in_scope_time():
-    #get the current time
+    # get the current time
     dt_now = datetime.datetime.now(datetime.timezone.utc)
     dt_minus_12 = dt_now - datetime.timedelta(hours=12)
 
@@ -17,7 +16,7 @@ def in_scope_time():
 
 @pytest.fixture
 def too_old_time():
-    #get the current time
+    # get the current time
     dt_now = datetime.datetime.now(datetime.timezone.utc)
     dt_minus_36 = dt_now - datetime.timedelta(hours=36)
 

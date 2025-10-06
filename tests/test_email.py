@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from briefme.main import send_email
 
+
 @patch('briefme.main.smtplib.SMTP_SSL')
 def test_send_email_success(mock_smtp):
     """Test successful email sending"""
@@ -18,6 +19,7 @@ def test_send_email_success(mock_smtp):
         
         mock_server.login.assert_called_once_with('from@example.com', 'password')
         mock_server.sendmail.assert_called_once()
+
 
 @patch('briefme.main.smtplib.SMTP_SSL')
 def test_send_email_handles_smtp_failure(mock_smtp):

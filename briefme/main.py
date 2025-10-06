@@ -24,22 +24,27 @@ from .config import (
     MAX_AGE_HOURS
 )
 
+
 class RSSItem:
     def __init__(self, title, summary, link):
         self.title = title
         self.summary = summary
         self.link = link
 
+
 # ---------- FETCH FEEDS ----------
 def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
     items = []
     for url in feeds:
         feed = feedparser.parse(url)
-        logger.info(f"Fetched feed from {url} with {len(feed.entries)} entries.")
+        logger.info(
+            f"Fetched feed from {url} with {len(feed.entries)} entries."
+        )
         for entry in feed.entries[:max_items]:
 
-            if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                #Check if published date is older than MAX_AGE_HOURS hours
+            if hasattr(entry, 'published_parsed') and \
+                    entry.published_parsed:
+                # Check if published date is older than MAX_AGE_HOURS hours
                 from datetime import datetime, timedelta
                 pub_date = datetime(*entry.published_parsed[:6])
                 if pub_date < datetime.now() - timedelta(hours=MAX_AGE_HOURS):
@@ -51,6 +56,7 @@ def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
                 )
                 items.append(item)
     return items
+
 
 # ---------- SUMMARISE WITH OPENAI ----------
 def summarise_text(items: List[RSSItem], max_words=2000):
@@ -65,11 +71,16 @@ def summarise_text(items: List[RSSItem], max_words=2000):
         )
 
         content = response.output_text
-        logger.debug(f"Generated summary content:\n-------\n\n{content}")
+        logger.debug(
+            f"Generated summary content:\n-------\n\n{content}"
+        )
     except Exception as e:
-        logger.error(f"Error occurred while summarizing text using OpenAI API: {e}")
+        logger.error(
+            f"Error occurred while summarizing text using OpenAI API: {e}"
+        )
         raise
     return content
+
 
 # ---------- SEND EMAIL ----------
 def send_email(subject, body):
@@ -83,20 +94,24 @@ def send_email(subject, body):
         server.login(EMAIL_FROM, EMAIL_PASSWORD)
         server.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
 
+
 # ---------- MAIN ----------
 if __name__ == "__main__":
     logger.info("Starting daily digest process...")
     rss_items: List[RSSItem] = fetch_rss_content(RSS_FEEDS)
-    
+
     if not rss_items:
-        summary = "<div class='section'><h2>No Updates</h2><p>No new cybersecurity articles found today.</p></div>"
+        summary = (
+            "<div class='section'><h2>No Updates</h2>"
+            "<p>No new cybersecurity articles found today.</p></div>"
+        )
         logger.info("No RSS items found")
     else:
         logger.info(f"Processing {len(rss_items)} RSS items")
         summary = summarise_text(rss_items)
-    
+
     html_summary = EMAIL_TEMPLATE.format(summary=summary, title=TITLE)
-    
+
     try:
         send_email(TITLE, html_summary)
         logger.info("Daily summary sent successfully!")

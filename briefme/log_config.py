@@ -1,5 +1,5 @@
 import logging
-import os, sys
+import sys
 
 from .config import LOG_LEVEL
 
