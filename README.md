@@ -28,7 +28,7 @@
 
 ## Configuration
 
-All sensitive and environment-specific values are loaded from `.env` via `briefme/config.py` using `python-dotenv`.  
+All sensitive and environment-specific values are loaded from `.env` via `briefme/config.py` using `python-dotenv`.
 No secrets are hardcoded.
 
 - **Add/modify RSS feeds:** Edit `RSS_FEEDS` in `config.py`.

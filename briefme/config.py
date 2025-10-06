@@ -1,9 +1,10 @@
 import os
-from dotenv import load_dotenv
+
 import yaml
+from dotenv import load_dotenv
 
 # Load environment variables
-if os.path.exists('.env'):
+if os.path.exists(".env"):
     load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -18,7 +19,7 @@ TITLE = os.getenv("TITLE", "Your Security News Digest")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 # Configuration validation
-required_vars = ['OPENAI_API_KEY', 'EMAIL_FROM', 'EMAIL_TO', 'EMAIL_PASSWORD']
+required_vars = ["OPENAI_API_KEY", "EMAIL_FROM", "EMAIL_TO", "EMAIL_PASSWORD"]
 missing_vars = [var for var in required_vars if not globals()[var]]
 if missing_vars:
     raise ValueError(
@@ -35,16 +36,16 @@ OPENAI_MAX_TOKENS = int(os.getenv("OPENAI_MAX_TOKENS", "800"))
 # Load RSS feeds from feeds.yaml
 try:
     # Try package directory first
-    feeds_file = os.path.join(os.path.dirname(__file__), 'feeds.yaml')
+    feeds_file = os.path.join(os.path.dirname(__file__), "feeds.yaml")
     if not os.path.exists(feeds_file):
         # Fallback to project root
         feeds_file = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), 'feeds.yaml'
+            os.path.dirname(os.path.dirname(__file__)), "feeds.yaml"
         )
 
-    with open(feeds_file, 'r') as f:
+    with open(feeds_file, "r") as f:
         feeds_config = yaml.safe_load(f)
-    RSS_FEEDS = feeds_config.get('feeds', [])
+    RSS_FEEDS = feeds_config.get("feeds", [])
 except (FileNotFoundError, yaml.YAMLError) as e:
     print(f"Warning: Could not load feeds.yaml: {e}")
     RSS_FEEDS = []

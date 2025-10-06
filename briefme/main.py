@@ -1,28 +1,28 @@
-import feedparser
+import json
 import smtplib
 import ssl
-import json
 from email.mime.text import MIMEText
-from openai import OpenAI
 from typing import List
 
-from .log_config import logger
+import feedparser
+from openai import OpenAI
 
 # ---------- CONFIG ----------
 from .config import (
-    OPENAI_API_KEY,
-    EMAIL_FROM,
-    EMAIL_TO,
-    SMTP_SERVER,
-    SMTP_PORT,
-    EMAIL_PASSWORD,
-    RSS_FEEDS,
-    EMAIL_TEMPLATE,
-    TITLE,
     AGENT_PROMPT,
+    EMAIL_FROM,
+    EMAIL_PASSWORD,
+    EMAIL_TEMPLATE,
+    EMAIL_TO,
+    MAX_AGE_HOURS,
+    OPENAI_API_KEY,
     OPENAI_MAX_TOKENS,
-    MAX_AGE_HOURS
+    RSS_FEEDS,
+    SMTP_PORT,
+    SMTP_SERVER,
+    TITLE,
 )
+from .log_config import logger
 
 
 class RSSItem:
@@ -41,18 +41,15 @@ def fetch_rss_content(feeds, max_items=5) -> List[RSSItem]:
             f"Fetched feed from {url} with {len(feed.entries)} entries."
         )
         for entry in feed.entries[:max_items]:
-
-            if hasattr(entry, 'published_parsed') and \
-                    entry.published_parsed:
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
                 # Check if published date is older than MAX_AGE_HOURS hours
                 from datetime import datetime, timedelta
+
                 pub_date = datetime(*entry.published_parsed[:6])
                 if pub_date < datetime.now() - timedelta(hours=MAX_AGE_HOURS):
                     continue
                 item = RSSItem(
-                    title=entry.title,
-                    summary=entry.summary,
-                    link=entry.link
+                    title=entry.title, summary=entry.summary, link=entry.link
                 )
                 items.append(item)
     return items
@@ -67,13 +64,11 @@ def summarise_text(items: List[RSSItem], max_words=2000):
             model="gpt-4o-mini",
             instructions=AGENT_PROMPT,
             input=json.dumps(json_dict, indent=2),
-            max_output_tokens=OPENAI_MAX_TOKENS
+            max_output_tokens=OPENAI_MAX_TOKENS,
         )
 
         content = response.output_text
-        logger.debug(
-            f"Generated summary content:\n-------\n\n{content}"
-        )
+        logger.debug(f"Generated summary content:\n-------\n\n{content}")
     except Exception as e:
         logger.error(
             f"Error occurred while summarizing text using OpenAI API: {e}"

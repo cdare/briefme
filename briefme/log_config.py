@@ -6,7 +6,7 @@ from .config import LOG_LEVEL
 logger = logging.getLogger(__name__)
 
 handler = logging.StreamHandler(sys.stdout)
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 handler.setFormatter(formatter)
 
 if not logger.hasHandlers():
