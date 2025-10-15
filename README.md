@@ -2,6 +2,8 @@
 
 **briefme** is a Python application that generates a daily news digest by fetching RSS feeds, summarizing them using OpenAI, and sending the result as an HTML email.
 
+<img width="834" height="624" alt="Screenshot 2025-10-15 at 09 34 57" src="https://github.com/user-attachments/assets/86cc5448-fde0-4e38-833a-2512c6153324" />
+
 ## Features
 
 - Fetches and parses multiple RSS feeds
